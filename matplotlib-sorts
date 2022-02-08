@@ -3,9 +3,11 @@ from random import randint
 import copy
 import time
 
+
 def switch(a, b):
     '''Поменять значения переменных'''
     return(b, a)
+
 
 def bubblesort(data):
     '''Сортировка пузырьком'''
@@ -14,6 +16,7 @@ def bubblesort(data):
             if data[j-1] > data[j]:
                 data[j-1], data[j] = switch(data[j-1], data[j])
     return data
+
 
 def shakersort(data):
     '''Шейкерная сортировка'''
@@ -28,15 +31,15 @@ def shakersort(data):
         diff += 1
         if not change:
             break
-        
         for k in range(len(data) - diff - 1, 0, -1): 
             if data[k-1] > data[k]:
                 data[k-1], data[k] = switch(data[k-1], data[k]) 
                 change = True 
     return data
 
-'''Шейкерная сортировка'''
+
 def quicksort(nums):
+   '''Быстрая сортировка'''
    if len(nums) <= 1:
        return nums
    else:
@@ -54,11 +57,11 @@ def quicksort(nums):
        return quicksort(s_nums) + e_nums + quicksort(m_nums)
 
 
-list_funcs = [bubblesort, shakersort, quicksort]
-titles = ['Bubble sort', 'Shaker sort', 'Quicksort']
 data_time = []
 data_num = []
 
+list_funcs = [bubblesort, shakersort, quicksort]
+titles = ['Bubble sort', 'Shaker sort', 'Quicksort']
 plt.title('Сложность сортировок')
 plt.xlabel('Входные данные')
 plt.ylabel('Время выполнения')
@@ -66,8 +69,7 @@ for el in range(2, 3):
     data_time = []
     data_num = []
     for nums in range(10000, 20000, 1000):
-        array = [randint(-1000, 1000) for _ in range(nums)]
-        data = array.copy()
+        data = [randint(-1000, 1000) for _ in range(nums)]
         start_time = time.time() 
         list_funcs[el](data)
         end_time = time.time() 
