@@ -8,15 +8,33 @@ def switch(a, b):
     '''Поменять значения переменных'''
     return(b, a)
 
-
 def bubblesort(data):
     '''Сортировка пузырьком'''
+    for diff in range(len(data)):
+        for j in range(1, len(data)):
+            if data[j-1] > data[j]:
+                data[j-1], data[j] = switch(data[j-1], data[j])
+    return data
+
+def bubblesort_v2(data):
+    '''Сортировка пузырьком v2'''
     for diff in range(len(data)):
         for j in range(1, len(data) - diff):
             if data[j-1] > data[j]:
                 data[j-1], data[j] = switch(data[j-1], data[j])
     return data
 
+def bubblesort_v3(data):
+    '''Сортировка пузырьком v3'''
+    flag = True
+    while flag:
+        flag = False
+        for diff in range(len(data)):
+            for j in range(1, len(data) - diff):
+                if data[j-1] > data[j]:
+                    data[j-1], data[j] = switch(data[j-1], data[j])
+                    flag = True
+    return data
 
 def shakersort(data):
     '''Шейкерная сортировка'''
@@ -57,24 +75,29 @@ def quicksort(nums):
        return quicksort(s_nums) + e_nums + quicksort(m_nums)
 
 
+list_funcs = [bubblesort, bubblesort_v2, bubblesort_v3, shakersort, quicksort]
+titles = []
 data_time = []
 data_num = []
-
-list_funcs = [bubblesort, shakersort, quicksort]
-titles = ['Bubble sort', 'Shaker sort', 'Quicksort']
+for funcs in list_funcs:
+    titles.append(funcs.__doc__)
+    data_time.append([])
+    data_num.append([])
+    
 plt.title('Сложность сортировок')
 plt.xlabel('Входные данные')
 plt.ylabel('Время выполнения')
-for el in range(2, 3):
-    data_time = []
-    data_num = []
-    for nums in range(10000, 20000, 1000):
-        data = [randint(-1000, 1000) for _ in range(nums)]
+
+for nums in range(100, 4000, 100):
+    data_all = [randint(-1000, 1000) for _ in range(nums)]
+    for el in range(len(list_funcs)):
+        data = data_all.copy()
         start_time = time.time() 
         list_funcs[el](data)
         end_time = time.time() 
-        data_num.append(nums) 
-        data_time.append(end_time - start_time)
-    plt.plot(data_num, data_time, label=titles[el])
+        data_num[el].append(nums) 
+        data_time[el].append(end_time - start_time)
+for el in range(len(list_funcs)):
+    plt.plot(data_num[el], data_time[el], label=titles[el])
 plt.legend()
 plt.show()
