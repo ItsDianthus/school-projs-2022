@@ -55,7 +55,6 @@ def shakersort(data):
                 change = True 
     return data
 
-
 def quicksort(nums):
    '''Быстрая сортировка'''
    if len(nums) <= 1:
@@ -74,8 +73,45 @@ def quicksort(nums):
                e_nums.append(n)
        return quicksort(s_nums) + e_nums + quicksort(m_nums)
 
+def oddevensort(data):
+    '''Чётно-нечётная сортировка'''
+    n = len(data)
+    flag = False
+    while not flag:
+        flag = True
+        for i in range(0, len(data)-1, 2):
+            if data[i] > data[i+1]:
+                data[i], data[i+1] = switch(data[i], data[i+1])
+                flag = False              
+        for i in range(1, len(data)-1, 2):
+            if data[i] > data[i+1]:
+                data[i], data[i+1] = switch(data[i], data[i+1])
+                flag = False
+    return data
 
-list_funcs = [bubblesort, bubblesort_v2, bubblesort_v3, shakersort, quicksort]
+def mergesort(data):
+    '''Сортировка слиянием'''
+    if len(data) == 1:
+        return data
+    fin = []
+    left = data[:len(data)//2]
+    right = data[len(data)//2:]
+    left = mergesort(left)
+    right = mergesort(right)
+    while left != [] and right != []:
+        if left[0] > right[0]:
+            fin.append(right[0])
+            del right[0]
+        else:
+            fin.append(left[0])
+            del left[0]
+    fin += left
+    fin += right
+    return result
+
+
+
+list_funcs = [bubblesort] #bubblesort_v2, bubblesort_v3, shakersort, quicksort, mergesort]
 titles = []
 data_time = []
 data_num = []
@@ -85,8 +121,8 @@ for funcs in list_funcs:
     data_num.append([])
     
 plt.title('Сложность сортировок')
-plt.xlabel('Входные данные')
-plt.ylabel('Время выполнения')
+plt.xlabel('Входные данные (n элементов)')
+plt.ylabel('Время выполнения (t, c)')
 
 for nums in range(100, 4000, 100):
     data_all = [randint(-1000, 1000) for _ in range(nums)]
