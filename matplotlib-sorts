@@ -89,6 +89,44 @@ def oddevensort(data):
                 flag = False
     return data
 
+def insertionsort(data):
+    '''Сортировка вставками'''
+    for i in range(len(data)):
+        key = data[i]
+        j = i-1
+        while data[j] > key and j >= 0:
+            data[j+1] = data[j]
+            j -= 1
+        data[j+1] = key
+    return data
+
+def pairwise_insertionsort(data):
+    '''Парная сортировка вставками'''
+    for i in range(0, len(data)-(len(data)%2), 2):
+        j = i-1
+        first = data[i]
+        second = data[i+1]
+        if second > first:
+            first, second = switch(first, second)
+        while data[j] > first and j >= 0:
+            data[j + 2] = data[j]
+            j -= 1
+        data[j + 2] = first
+        while data[j] > second and j >= 0:
+            data[j + 1] = data[j]
+            j -= 1
+            data[j + 1] = second
+    if len(data)%2 == 1:
+        i = (len(data)-1)
+        j = i-1
+        key = data[i]
+        while data[j] > key and j >= 0:
+            data[j + 1] = data[j]
+            j -= 1
+        data[j + 1] = key
+    return data
+
+
 def mergesort(data):
     '''Сортировка слиянием'''
     if len(data) == 1:
@@ -107,11 +145,10 @@ def mergesort(data):
             del left[0]
     fin += left
     fin += right
-    return result
+    return fin
 
 
-
-list_funcs = [bubblesort] #bubblesort_v2, bubblesort_v3, shakersort, quicksort, mergesort]
+list_funcs = [bubblesort, bubblesort_v2, bubblesort_v3, shakersort, quicksort, oddevensort, insertionsort, pairwise_insertionsort, mergesort]
 titles = []
 data_time = []
 data_num = []
@@ -124,7 +161,7 @@ plt.title('Сложность сортировок')
 plt.xlabel('Входные данные (n элементов)')
 plt.ylabel('Время выполнения (t, c)')
 
-for nums in range(100, 4000, 100):
+for nums in range(100, 8000, 100):
     data_all = [randint(-1000, 1000) for _ in range(nums)]
     for el in range(len(list_funcs)):
         data = data_all.copy()
