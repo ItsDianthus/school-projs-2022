@@ -1,0 +1,27 @@
+class Lst_work():
+    def __init__(self, lst):
+        self.lst = lst
+        
+    def even_el(self):
+        new_lst = []
+        for i in range(1, len(self.lst), 2):
+            new_lst.append(self.lst[i])
+        return new_lst
+    
+    def reverse(self):
+        reverse_lst = []
+        for i in range(len(self.lst)-1, -1, -1):
+            reverse_lst.append(self.lst[i])
+        return reverse_lst
+    
+    def thirds(self):
+        if (len(self.lst))%3 == 0:
+            ost = 0
+        else:
+            ost = 1
+        first_third = self.lst[:(len(self.lst)//3+ost)]
+        last_third = self.lst[-(len(self.lst)//3):]
+        return first_third, last_third
+            
+lst = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+lst1 = Lst_work(lst)
