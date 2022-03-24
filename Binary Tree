@@ -1,0 +1,39 @@
+class Node:
+    def __init__(self, value, r_child = None, l_child = None):
+        self.value = value
+        self.r_child = r_child
+        self.l_child = l_child
+
+class BST:
+    def __init__(self):
+        self.root = None
+
+    def insert(self, value):
+        if self.root == None:
+            self.root = Node(value)
+        else:
+            self._insert(value, self.root)
+            
+    def _insert(self, value, cur_node):
+        if value > cur_node.value:
+            if cur_node.r_child is None:
+                cur_node.r_child = Node(value)
+            else:
+                self._insert(value, cur_node.r_child)
+        elif value < cur_node.value:
+            if cur_node.l_child is None:
+                cur_node.l_child = Node(value)
+            else:
+                self._insert(value, cur_node.l_child)
+
+    def check(self, cur_node):
+        if cur_node is None:
+            
+    def inOrder(self, cur_node):
+        if cur_node.l_child is None:
+            print(cur_node.value)
+        else:
+            self.inOrder(
+        
+                
+tree = BST()
