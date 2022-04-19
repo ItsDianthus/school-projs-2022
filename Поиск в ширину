@@ -1,0 +1,29 @@
+n, m = map(int, input().split())
+ribs = [] #рёбра матрицы
+dirs = [0]*n #расстояние
+prnt = [0]*n #список родителей
+queue = [1] 
+vstd = [] 
+for i in range(m):
+    ribs.append(list(map(int, input().split())))
+
+while queue != []:
+    num = queue[0]
+    for j in ribs:
+        if j[0] == num and j[1] not in queue and j[1] not in vstd:
+            queue.append(j[1]) #добавление в очередь числа
+            prnt[j[1]-1] = num - 1  #определение родителя
+            dirs[j[1]-1] = dirs[prnt[j[1]-1]] + 1 #расстояние от родителя
+    vstd.append(num)
+    del queue[0]
+
+
+"""
+5 6 
+1 2
+1 3
+1 4
+3 5
+2 3
+3 4
+"""
