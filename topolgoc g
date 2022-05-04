@@ -1,0 +1,32 @@
+n, m = map(int, input().split())
+ribs = []
+visited = []
+array = [1]
+choice = []
+for i in range(m):
+    ribs.append(list(map(int, input().split())))
+
+def Recurs(num):
+    choice = []
+    print('choice clears')
+    for j in ribs:
+        if j[0] == num and j[1] not in array and j[1] not in visited:
+            choice.append(j[1])
+            print('choice appends', j[1])
+    choice.sort()
+    if choice != []:
+        for k in range(len(choice)):
+            Recurs(choice[k])
+    else:
+        visited.append(num)
+        return num
+    
+Recurs(1)
+
+5 6
+1 2
+1 3
+1 4
+3 2
+4 3
+3 5
