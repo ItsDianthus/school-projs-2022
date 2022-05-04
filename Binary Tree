@@ -1,9 +1,10 @@
 class Node:
-    def __init__(self, value, parent = None, r_child = None, l_child = None):
+    def __init__(self, value, parent = None, r_child = None, l_child = None, height = 0):
         self.value = value
         self.parent = parent
         self.r_child = r_child
         self.l_child = l_child
+        self.height = height
 
     def hasRightChild(self):
         if self.r_child is None:
@@ -53,10 +54,77 @@ class Node:
 class BST:
     def __init__(self):
         self.root = None
+
+
+    def width(self):
+        if self.root == None:
+            print('No root, width = 0')
+        elif self.root.hasBothChild() == False:
+            return 1
+        else:
+            return self._width(self.root)
+
+    def _width(self, cur_node):
+        if cur_node != None:
+            return 1 + self._width(cur_node.l_child) + self._width(cur_node.r_child)
+        else:
+            return 0
+
+    def depth(self):
+        if self.root == None:
+            print('No root, depth = 0')
+        elif self.root.hasBothChild() == False:
+            return 1
+        else:
+            return self._depth(self.root)
+
+    def _depth(self, cur_node):
+        if cur_node != None:
+            return 1 + max(self._depth(cur_node.l_child), self._depth(cur_node.r_child))
+        else:
+            return 0
+
+    def height(self, value):
+        if self.root == None:
+            print('no height srry')
+        elif self.search(value):
+            return self._height(value, self.root)
+        
+    def _height(self, value, cur_node):
+        if value == cur_node.value:
+            return self._depth(cur_node)
+        elif value > cur_node.value:
+            return self._height(value, cur_node.r_child)
+        elif value < cur_node.value:
+            return self._height(value, cur_node.l_child)
+
+        
+    def balance_factor(self, value):
+        if self.root == None:
+            print('no root srry')
+        elif self.search(value):
+            return self._balance_factor(value, self.root)
+        
+    def _balance_factor(self, value, cur_node):
+        if value == cur_node.value:
+            if cur_node.hasRightChild() and cur_node.hasLeftChild():
+                return self._depth(cur_node.r_child) - self._depth(cur_node.l_child)
+            elif cur_node.hasRightChild():
+                return self._depth(cur_node.r_child)
+            elif cur_node.hasLeftChild():
+                return self._depth(cur_node.l_child)
+            else:
+                print('0 - 0 = 0, maan')
+        elif value > cur_node.value:
+            return self._height(value, cur_node.r_child)
+        elif value < cur_node.value:
+            return self._height(value, cur_node.l_child)
+        
         
     def insert(self, value):
         if self.root == None:
             self.root = Node(value)
+            self.root.height = 0
         else:
             self._insert(value, self.root)
             
@@ -65,14 +133,26 @@ class BST:
             if cur_node.r_child is None:
                 cur_node.r_child = Node(value)
                 cur_node.r_child.parent = cur_node
+                #while has parents, height +1
+                if not cur_node.hasBothChild():
+                    self.height_changer(cur_node.r_child)
+                # test if balance_fact failed
             else:
                 self._insert(value, cur_node.r_child)
         elif value < cur_node.value:
             if cur_node.l_child is None:
                 cur_node.l_child = Node(value)
                 cur_node.l_child.parent = cur_node
+                if not cur_node.hasBothChild():
+                    self.height_changer(cur_node.l_child)
             else:
                 self._insert(value, cur_node.l_child)
+                
+    def height_changer(self, cur_node):
+        if cur_node.parent:
+            cur_node.parent.height += 1
+            #NOT ONE, What if it already has child
+            self.height_changer(cur_node.parent)
 
     def search(self, value):
         if self.root.value == value:
@@ -94,6 +174,7 @@ class BST:
             else:
                 return self._search(value, cur_node.l_child)
 
+
     def delete(self, value):
         if self.root.value == value:
             return('You can"t delete the root!')
@@ -106,11 +187,23 @@ class BST:
     def _delete(self, value, cur_node):
         if value == cur_node.value:
             if cur_node.hasLeftChild():
-                cur_node = self._rightest(cur_node.l_child)
+                theRight = self._rightest(cur_node.l_child)
+                cur_node.value = theRight.value
+                print('cur_node has left')
             elif cur_node.hasRightChild():
-                cur_node = cur_node.r_child
+                #print('cur_node', cur_node.value)
+                #print('cur_node right is', cur_node.r_child.value)
+                cur_node.value = cur_node.r_child.value
+                if cur_node.r_child.hasLeftChild():
+                    cur_node.l_child = cur_node.r_child.l_child
+                if cur_node.r_child.hasRightChild():
+                    cur_node.r_child = cur_node.r_child.r_child
+                cur_node.r_child = None
+                print('cur_node has right')
+                
             else:
-                cur_node = 
+                cur_node.value = None
+                print('cur_node has no children and is none')
         elif value > cur_node.value:
             return self._delete(value, cur_node.r_child)
         elif value < cur_node.value:
@@ -121,6 +214,7 @@ class BST:
             return cur_node
         else:
             return self._rightest(cur_node.r_child)
+
 
     def InOrder(self):
         if self.root == None:
@@ -172,7 +266,10 @@ tree = BST()
 tree.insert(50)
 tree.insert(40)
 tree.insert(55)
-tree.insert(45)
+#tree.insert(45)
+#tree.insert(47)
+#tree.insert(46)
+#tree.insert(43)
 #tree.insert(9)
 #tree.insert(4)
 #tree.insert(8)
