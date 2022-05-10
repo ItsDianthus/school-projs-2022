@@ -1,0 +1,47 @@
+'''Ввод через ребра'''
+'''
+n, m = map(int, input().split()) #Количество вершин, введение инфы
+ribs = []
+for i in range(m):
+    ribs.append(list(map(int, input().split())))
+
+'''
+
+'''Ввод через матрицу'''
+
+n, st, fin = map(int, input().split()) #Количество вершин
+ribs = []
+rows = []
+for i in range(n):
+    rows.append(list(map(int, input().split())))
+ribs = [] 
+for j in range(n):
+    for k in range(n):
+        if rows[j][k] > 0:
+            ribs.append([j, k, rows[j][k]])
+print(ribs)
+
+visited = [False] * n
+dst = [1000] * n
+flag = True
+
+start = st-1
+dst[start] = 0
+while flag:
+    for rib in ribs:
+        if rib[0] == start:
+            new_dst = dst[start] + rib[2]
+            if new_dst < dst[rib[1]]:
+                dst[rib[1]] = new_dst
+    visited[start] = True
+    if visited == [True] * n:
+        flag = False
+        break
+    for nums in range(n):
+        min_ = 1000
+        if visited[nums] == 0 and dst[nums] < min_:
+            minimum = nums
+            min_ = dst[nums]
+    start = minimum
+
+print(dst[fin-1])
