@@ -1,0 +1,55 @@
+def delete_node(self, value):
+        if self.root:
+            self.delete_node_(self.root, value)
+            
+    def delete_node_(self, cur_node, value):
+        if cur_node is None:
+            return cur_node
+        elif value < cur_node.value:
+            self.delete_node_(cur_node.left, value)
+        elif value > cur_node.value:
+            self.delete_node_(cur_node.right, value)
+        else: 
+            deleting_node = cur_node
+            if deleting_node.hasBothChild():
+                min_left = self.searchMin(deleting_node.right)
+                print("both", min_left.value)
+                deleting_node.left.parent = min_left
+                if min_left.parent is deleting_node:
+                    min_left.parent.right = None
+                else:
+                    min_left.parent.left = None
+                min_left.left = deleting_node.left
+                min_left.right = deleting_node.right
+                if deleting_node.parent.left == deleting_node:
+                    deleting_node.parent.left = min_left
+                else: 
+                    deleting_node.parent.right = min_left
+                min_left.parent = deleting_node.parent
+                self.fixheight(min_left)
+            elif deleting_node.hasLeftChild():
+                print("left")
+                
+                if deleting_node.parent.left == deleting_node:
+                    deleting_node.parent.left = deleting_node.left 
+                else: 
+                    deleting_node.parent.right = deleting_node.left 
+
+                deleting_node.left.parent = deleting_node.parent
+                self.fixheight(deleting_node.left)
+            elif deleting_node.hasRightChild():
+                print("right")
+                if deleting_node.parent.left == deleting_node:
+                    deleting_node.parent.left = deleting_node.right
+                else: 
+                    deleting_node.parent.right = deleting_node.right 
+                
+                deleting_node.right.parent = deleting_node.parent
+            else:
+                if deleting_node.parent.left == deleting_node:
+                    deleting_node.parent.left = None 
+                else: 
+                    deleting_node.parent.right = None 
+                deleting_node.parent = None
+        cur_node = self.balance(cur_node)
+        self.fixheight(cur_node)
