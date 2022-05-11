@@ -1,0 +1,39 @@
+import collections  
+def bfs(data, s):  
+    visited, queue = {s: None}, collections.deque([s])  
+    while queue:  
+        u = queue.popleft()  
+        for v in data[u]:  
+            if v in visited:
+                continue  
+            visited[v] = u
+            queue.append(v)  
+    return visited  
+
+    
+
+def rec_dfs(data,s,visited=None):
+    if visited is None: visited = []
+    visited.append(s)
+    for u in data[s]:
+        if u in visited:continue
+        rec_dfs(data,u,visited)
+    return visited
+
+a, b, c, d, e, f, g, h, i= range(9)  
+
+data = {    
+        'a': ["b", "c"] ,    
+        'b': ["d", "e", "i"],    
+        'c': ["d"],    
+        'd': ["a", "h"],    
+        'e': ["f"],    
+        'f': ["g"],  
+        'g': ["e", "h"],  
+        'h': ["i"],  
+        'i': ["h"]  
+        }  
+        
+print(bfs(data, "a"))
+
+print(rec_dfs(data, "a"))
