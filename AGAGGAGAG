@@ -1,0 +1,385 @@
+class Node:
+    def __init__(self, value, parent = None, r_child = None, l_child = None, height = 1):
+        self.value = value
+        self.parent = parent
+        self.r_child = r_child
+        self.l_child = l_child
+        self.height = height
+
+    def hasRightChild(self):
+        if self.r_child is None:
+            return False
+        else:
+            return True
+
+    def hasLeftChild(self):
+        if self.l_child is None:
+            return False
+        else:
+            return True
+        
+    def hasBothChild(self):
+        if self.hasRightChild() and self.hasLeftChild():
+            return True
+        else:
+            return False
+        
+    def isParent(self):
+        if self.hasRightChild() or self.hasLeftChild():
+            return True
+        else:
+            return False
+        
+    def isRoot(self):
+        if self.parent == None:
+            return True
+        else:
+            return False
+        
+    def isLeftChild(self):
+        if self.parent.l_child == self:
+            return True
+        else:
+            return False
+        
+    def isRightChild(self):
+        if self.parent.r_child == self:
+            return True
+        else:
+            return False
+
+
+
+class AVL:
+    def __init__(self):
+        self.root = None
+
+
+    def insert(self, value):
+        if self.root == None:
+            self.root = Node(value)
+        else:
+            self._insert(value, self.root)
+
+    def _insert(self, value, cur_node):
+        if value > cur_node.value:
+            if cur_node.r_child is None:
+                cur_node.r_child = Node(value)
+                cur_node.r_child.parent = cur_node
+                #while has parents, height +1
+                # test if balance_fact failed
+            else:
+                self._insert(value, cur_node.r_child)
+        elif value < cur_node.value:
+            if cur_node.l_child is None:
+                cur_node.l_child = Node(value)
+                cur_node.l_child.parent = cur_node
+            else:
+                self._insert(value, cur_node.l_child)
+        #print('insert curnode = ', cur_node.value)
+        cur_node = self.balance(cur_node)
+        self.fixheight(cur_node)
+
+        
+    def getheight(self, cur_node):
+      if cur_node != None:
+         return cur_node.height
+      else:
+         return False
+        
+    def bfactor(self, cur_node):
+        '''Фактор баланса'''
+        return self.getheight(cur_node.r_child) - self.getheight(cur_node.l_child)
+      
+    def fixheight(self, cur_node):
+        '''Перерасчет высот'''
+        if self.bfactor(cur_node) > 0:
+            cur_node.height = self.getheight(cur_node.r_child) + 1
+        else:
+            cur_node.height = self.getheight(cur_node.l_child) + 1
+
+    def balance(self, node):
+        self.fixheight(node)
+        if self.bfactor(node) == 2:
+            if self.bfactor(node.r_child) < 0:
+                node.r_child = self.rotateRight(node.r_child)
+            return self.rotateLeft(node)
+
+        if self.bfactor(node) == -2:
+            if self.bfactor(node.left) > 0:
+                node.l_child = self.rotateLeft(node.l_child)
+            return self.rotateRight(node)
+        return node
+
+    def rotateRight(self, p):
+        pred = p.parent
+        
+        q = p.l_child # p правый ребенок
+        p.l_child = q.r_child #q has B
+        q.r_child = p #q is going down
+        p.parent = q
+
+        if p.r_child: #If has A
+            p.r_child.parent = p
+ 
+        if pred:
+            q.parent = pred
+            if p == pred.l_child:
+                pred.l_child = q
+            else:
+                pred.r_child = q
+        else:
+            self.root = q
+            q.parent = None
+        
+        self.fixheight(p)
+        self.fixheight(q)
+        
+        return q
+        
+
+    def rotateLeft(self, q):
+        pred = q.parent
+        
+        p = q.r_child # p правый ребенок
+        q.r_child = p.l_child #q has B
+        p.l_child = q #q is going down
+        q.parent = p
+
+        if q.l_child: #If has A
+            q.l_child.parent = q
+            
+        if pred:
+            p.parent = pred
+            if q == pred.l_child:
+                pred.l_child = p
+            else:
+                pred.r_child = p
+        else:
+            self.root = p
+            p.parent = None
+        
+        self.fixheight(p)
+        self.fixheight(q)
+        
+        return p
+      
+                
+                
+    def InOrder(self):
+        if self.root == None:
+            print('Tree Is Empty')
+        else:
+            self._InOrder(self.root)
+            
+    def _InOrder(self, cur_node):
+        if cur_node is None:
+            pass
+            #print('cur_node is none')
+        else:
+            self._InOrder(cur_node.l_child)
+            print(cur_node.value)
+            self._InOrder(cur_node.r_child)
+
+    def PreOrder(self):
+        if self.root == None:
+            print('Tree Is Empty')
+        else:
+            self._PreOrder(self.root)
+            
+    def _PreOrder(self, cur_node):
+        if cur_node is None:
+            pass
+            #print('cur_node is none')
+        else:
+            print(cur_node.value)
+            self._PreOrder(cur_node.l_child)
+            self._PreOrder(cur_node.r_child)
+
+    def PostOrder(self):
+        if self.root == None:
+            print('Tree Is Empty')
+        else:
+            self._PostOrder(self.root)
+            
+    def _PostOrder(self, cur_node):
+        if cur_node is None:
+            pass
+            #print('cur_node is none')
+        else:
+            self._PostOrder(cur_node.l_child)
+            self._PostOrder(cur_node.r_child)
+            print(cur_node.value)
+            
+
+    def exist(self, value):
+        '''Exists/No'''
+        if self.root.value == value:
+            return True
+        else:
+            return self._exist(value, self.root)
+
+    def _exist(self, value, cur_node):
+        if value == cur_node.value:
+            return True
+        elif value > cur_node.value:
+            if cur_node.r_child is None:
+                return False
+            else:
+                return self._exist(value, cur_node.r_child)
+        elif value < cur_node.value:
+            if cur_node.l_child is None:
+                return False
+            else:
+                return self._exist(value, cur_node.l_child)
+
+    def search(self, value):
+        '''Returns the node'''
+        if self.root.value == value:
+            return True
+        else:
+            return self._search(value, self.root)
+
+    def _search(self, value, cur_node):
+        if value == cur_node.value:
+            return cur_node
+        elif value > cur_node.value:
+            if cur_node.r_child is None:
+                return False
+            else:
+                return self._search(value, cur_node.r_child)
+        elif value < cur_node.value:
+            if cur_node.l_child is None:
+                return False
+            else:
+                self._search(value, cur_node.l_child)
+            
+    def get_min(self, cur_node):
+        if cur_node.hasLeftChild == 0:
+            return cur_node
+        else:
+            return self.get_min(cur_node.l_child)
+        
+    def get_max(self, cur_node):
+        if cur_node.hasRightChild == 0:
+            return cur_node
+        else:
+            return self.get_max(cur_node.r_child)
+            
+    def width(self):
+        if self.root == None:
+            print('No root, width = 0')
+        elif self.root.hasBothChild() == False:
+            return 1
+        else:
+            return self._width(self.root)
+
+    def _width(self, cur_node):
+        if cur_node != None:
+            return 1 + self._width(cur_node.l_child) + self._width(cur_node.r_child)
+        else:
+            return 0
+
+    def depth(self):
+        if self.root == None:
+            print('No root, depth = 0')
+        elif self.root.hasBothChild() == False:
+            return 1
+        else:
+            return self._depth(self.root)
+
+    def _depth(self, cur_node):
+        if cur_node != None:
+            return 1 + max(self._depth(cur_node.l_child), self._depth(cur_node.r_child))
+        else:
+            return 0
+        
+         
+         
+    def delete(self, value):
+        if self.root.value == value:
+            return('You can"t delete the root!')
+        elif self.search(value) is False:
+            return('There is no Node with this value')
+        else:
+            return self._delete(value, self.root)
+
+
+    def _delete(self, value, cur_node):
+        if cur_node == None:
+            return None
+        elif value > cur_node.value:
+            return self._delete(value, cur_node.r_child)
+        elif value < cur_node.value:
+            return self._delete(value, cur_node.l_child)
+        elif value == cur_node.value:
+            if cur_node.hasLeftChild():
+                print('Left child, rightest')
+                rightest = self.get_max(cur_node.l_child)
+                cur_node.value = rightest
+            elif cur_node.hasRightChild():
+                #print('cur_node', cur_node.value)
+                #print('cur_node right is', cur_node.r_child.value)
+                cur_node.value = cur_node.r_child.value
+                if cur_node.r_child.hasLeftChild():
+                    cur_node.l_child = cur_node.r_child.l_child
+                if cur_node.r_child.hasRightChild():
+                    cur_node.r_child = cur_node.r_child.r_child
+                cur_node.r_child = None
+                print('cur_node has right')
+                
+            else:
+                cur_node.value = None
+                print('cur_node has no children and is none')
+        
+        cur_node = self.balance(cur_node)
+        self.fixheight(cur_node)
+
+
+        
+tree = AVL()
+
+going = True
+while going:
+    strg = input().split()
+    if strg[0] == 'stop':
+        going = False
+        break
+    elif strg[0] == 'insert':
+        tree.insert(int(strg[1]))
+    elif strg[0] == 'find':
+        print(tree.exist(int(strg[1])))
+        
+    elif strg[0] == 'height':
+        if tree.root:
+            print(tree.depth())
+        else:
+            print('Tree Is Empty')
+    elif strg[0] == 'size':
+        if tree.root:
+            print(tree.width())
+        else:
+            print('Tree Is Empty')
+    elif strg[0] == 'root':
+        if tree.root:
+            print(tree.root.value)
+        else:
+            print('Tree Is Empty')
+    elif strg[0] == 'print':
+        if strg[1] == 'inOrder':
+            tree.InOrder()
+        elif strg[1] == 'preOrder':
+            tree.PreOrder()
+        else:
+            tree.PostOrder()
+    elif strg[0] == 'max':
+        if tree.root:
+            print(tree.get_max())
+        else:
+            print('Tree Is Empty')
+    elif strg[0] == 'min':
+        if tree.root:
+            print(tree.get_min())
+        else:
+            print('Tree Is Empty')
+
