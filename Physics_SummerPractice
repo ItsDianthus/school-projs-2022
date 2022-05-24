@@ -1,0 +1,34 @@
+from tkinter import *
+
+class HELP():
+    def __init__(self):
+        self.tk  = Tk()
+        self.tk.title('Some physics stuff')
+        self.create_field()
+        self.create_body()
+        self.create_stand()
+        self.tk.mainloop()
+
+    def create_field(self):
+        self.canv_w = 800
+        self.canv_h = 600
+        self.back_colour = '#999'
+        self.canv = Canvas(self.tk, width=self.canv_w, height=self.canv_h, background=self.back_colour)
+        self.canv.pack()
+
+    def create_body(self):
+        self.body = self.canv.create_oval(150, 150, 100, 100, fill='#568', outline="#999")
+        self.canv.move(self.body, 0, 300)
+
+    def create_stand(self):
+        self.stand_dist_horiz = 500
+        self.stand_dist_vertic = 200
+        self.stand = self.canv.create_rectangle(
+            100, 450, 150, 600,
+            outline="#fb0", fill="#fb0"
+        )
+        self.canv.pack()
+    
+    def create_btn
+
+app = HELP()
