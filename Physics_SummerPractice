@@ -38,14 +38,13 @@ class HELP():
         self.arrow = self.canv.create_line(self.body_center_hori, self.body_center_vert, self.body_center_hori + 50, self.body_center_vert, arrow=tkinter.LAST)
     
     def create_btn(self):
-        self.tk.bind_all("<ButtonRelease-1>", self.printing)
+        self.tk.bind_all("<Motion>", self.printing)
 
     def printing(self, event):
         print("Hey", event.widget)
         print(self.scale_w.get())
-        self.stand = self.canv.create_rectangle(
-            100, 600-self.scale_w.get(), 150, 600,
-            outline="#fb0", fill="#fb0"
+        self.canv.coords(self.stand,
+            100, 600-self.scale_w.get(), 150, 600
         )
 
     def create_scale(self):
