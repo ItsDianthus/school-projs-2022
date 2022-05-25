@@ -1,34 +1,62 @@
-from tkinter import *
+import tkinter as tkinter
 
 class HELP():
     def __init__(self):
-        self.tk  = Tk()
+        self.tk  = tkinter.Tk()
         self.tk.title('Some physics stuff')
         self.create_field()
         self.create_body()
+        self.create_scale()
         self.create_stand()
+        self.create_btn()
+        self.create_arrow()
+        print(600 - self.scale_w.get())
         self.tk.mainloop()
 
     def create_field(self):
         self.canv_w = 800
         self.canv_h = 600
         self.back_colour = '#999'
-        self.canv = Canvas(self.tk, width=self.canv_w, height=self.canv_h, background=self.back_colour)
+        self.canv = tkinter.Canvas(self.tk, width=self.canv_w, height=self.canv_h, background=self.back_colour)
         self.canv.pack()
 
     def create_body(self):
-        self.body = self.canv.create_oval(150, 150, 100, 100, fill='#568', outline="#999")
+        self.body = self.canv.create_oval(150, 150, 100, 100, fill='#568', outline="#568")
         self.canv.move(self.body, 0, 300)
+        self.body_center_hori = (self.canv.coords(self.body)[0] + self.canv.coords(self.body)[2]) / 2
+        self.body_center_vert = (self.canv.coords(self.body)[1] + self.canv.coords(self.body)[3]) / 2
 
     def create_stand(self):
-        self.stand_dist_horiz = 500
-        self.stand_dist_vertic = 200
+        self.stand_height = 600 - self.scale_w.get()
         self.stand = self.canv.create_rectangle(
-            100, 450, 150, 600,
+            100, 600, 150, 600,
             outline="#fb0", fill="#fb0"
         )
-        self.canv.pack()
+        self.canv.place()
+
+    def create_arrow(self):
+        self.arrow = self.canv.create_line(self.body_center_hori, self.body_center_vert, self.body_center_hori + 50, self.body_center_vert, arrow=tkinter.LAST)
     
-    def create_btn
+    def create_btn(self):
+        self.tk.bind_all("<ButtonRelease-1>", self.printing)
+
+    def printing(self, event):
+        print("Hey", event.widget)
+        print(self.scale_w.get())
+        self.stand = self.canv.create_rectangle(
+            100, 600-self.scale_w.get(), 150, 600,
+            outline="#fb0", fill="#fb0"
+        )
+
+    def create_scale(self):
+        self.scale_w = tkinter.Scale(
+            master=self.tk, orient="vertical", resolution=2, from_=150, to=0,
+            highlightbackground="#fb0", length=150
+            )
+        self.label_scale = tkinter.Label(master=self.tk, text="Height", bg="#fb0")
+        self.label_scale.place(x=30, y=425)
+        self.scale_w.place(x=30, y=450)
+
+
 
 app = HELP()
