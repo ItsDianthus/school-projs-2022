@@ -1,61 +1,156 @@
 import tkinter as tkinter
+import math as math
 
 class HELP():
     def __init__(self):
-        self.tk  = tkinter.Tk()
+        self.tk = tkinter.Tk()
         self.tk.title('Some physics stuff')
+        self.styles()
         self.create_field()
-        self.create_body()
-        self.create_scale()
-        self.create_stand()
-        self.create_btn()
-        self.create_arrow()
-        print(600 - self.scale_w.get())
+        self.create_items()
+        self.create_btns()
+        self.act = True
+        self.tk.bind_all("<Motion>",lambda x:self.arr_moving(x,'motion'))
+        self.tk.bind_all("<Button-1>",lambda x:self.arr_moving(x,'pressed'))
+        self.tk.bind_all("<ButtonRelease-1>", lambda x: self.arr_moving(x, 'released'))
         self.tk.mainloop()
 
     def create_field(self):
-        self.canv_w = 800
+        '''Создание поля'''
+        self.canv_w = 900
         self.canv_h = 600
         self.back_colour = '#999'
         self.canv = tkinter.Canvas(self.tk, width=self.canv_w, height=self.canv_h, background=self.back_colour)
         self.canv.pack()
 
-    def create_body(self):
-        self.body = self.canv.create_oval(150, 150, 100, 100, fill='#568', outline="#568")
-        self.canv.move(self.body, 0, 300)
+    def create_items(self):
+        '''Создание основных предметов'''
+        self.body = None
+        self.arrow = None
+        self.create_scale()
+        self.create_stand()
+        self.check_body()
+        self.check_arrow()
+        self.create_labs()
+
+    def styles(self):
+        # Indicators
+        self.font_indicators = "Arial 15"
+        self.fg_indicators = "#eee"
+        self.bg_indicators = "#333"
+
+    def check_body(self):
+        '''Создание мяча или изменение координат'''
+        if self.body is None:
+            self.body = self.canv.create_oval(150, 150, 100, 100, fill='#568', outline="#568")
+            self.canv.coords(self.body, 100, 550-self.scale_st.get(), 150, 600-self.scale_st.get())
         self.body_center_hori = (self.canv.coords(self.body)[0] + self.canv.coords(self.body)[2]) / 2
         self.body_center_vert = (self.canv.coords(self.body)[1] + self.canv.coords(self.body)[3]) / 2
 
     def create_stand(self):
-        self.stand_height = 600 - self.scale_w.get()
+        '''Создание стэнда'''
         self.stand = self.canv.create_rectangle(
             100, 600, 150, 600,
             outline="#fb0", fill="#fb0"
         )
         self.canv.place()
 
-    def create_arrow(self):
-        self.arrow = self.canv.create_line(self.body_center_hori, self.body_center_vert, self.body_center_hori + 50, self.body_center_vert, arrow=tkinter.LAST)
-    
-    def create_btn(self):
-        self.tk.bind_all("<Motion>", self.printing)
+    def check_arrow(self):
+        '''Создание стрелки или изменение координат'''
+        if self.arrow == None:
+            self.arrow = self.canv.create_line(
+                self.body_center_hori, self.body_center_vert,
+                self.body_center_hori + 50, self.body_center_vert,
+                arrow=tkinter.LAST, fill='#fefefe'
+            )
 
-    def printing(self, event):
+    def arr_moving(self, event, action=None):
+        '''Движение стрелки и предметов'''
         print("Hey", event.widget)
-        print(self.scale_w.get())
-        self.canv.coords(self.stand,
-            100, 600-self.scale_w.get(), 150, 600
-        )
+        self.change_items()
+        if action == "pressed":
+            self.act = True
+        elif action == "released":
+            self.act = False
+
+        if self.act and event.widget == self.canv:
+            self.canv.coords(self.arrow, self.body_center_hori, self.body_center_vert, event.x, event.y)
+            self.a = event.x
+            self.b = event.y
+        elif self.act:
+            self.canv.coords(self.arrow, self.body_center_hori, self.body_center_vert,
+                self.a, self.b)
+        self.arr_crd = self.canv.coords(self.arrow)
+        self.Vx = (self.arr_crd[2] - self.arr_crd[0]) / 100
+        self.Vy = (self.arr_crd[1] - self.arr_crd[3]) / 100
+        print(self.Vx, self.Vy)
+        self.Vo = round((self.Vx**2 + self.Vy**2)**0.5, 2)
+        self.label_Vx.config(text="Vx = " + str(self.Vx) + " м/с")
+        self.label_Vy.config(text="Vy = " + str(self.Vy) + " м/с")
+        self.label_g.config(text="g = " + str(self.scale_g.get()) + " м/с")
+        self.label_Vo.config(text="Vo = " + str(self.Vo) + " м/с")
+        self.angle = math.atan2(self.Vy/self.Vo, self.Vx/self.Vo) * 180.0/math.pi
+        if str(round(self.angle)) != "1":
+            self.label_angle.config(text="Angle = " + str(round(self.angle)) + " degrees")
+        else:
+            self.label_angle.config(text="Angle = 1 degree")
+
+    def change_items(self):
+        self.canv.coords(self.stand, 100, 600 - self.scale_st.get(), 150, 600)
+        self.canv.coords(self.body, 100, 550 - self.scale_st.get(), 150, 600 - self.scale_st.get())
+        self.check_body()
+
+    def create_labs(self):
+        """Indicators"""
+        # Vx - проекция скорости на ось абсцисс
+        self.label_Vx = tkinter.Label(master=self.tk, text="Vx = 0.00 м/с", fg=self.fg_indicators, bg=self.bg_indicators, font=self.font_indicators)
+        self.label_Vx.place(x=10, y=60)
+        # Vy - проецкия скорости на ось ординат
+        self.label_Vy = tkinter.Label(master=self.tk, text="Vy = 0.00 м/с", fg=self.fg_indicators, bg=self.bg_indicators, font=self.font_indicators)
+        self.label_Vy.place(x=10, y=20)
+        # G - ускорение свободного падения
+        self.label_g = tkinter.Label(master=self.tk, text="g = 0.0 м/с", fg=self.fg_indicators, bg=self.bg_indicators, font=self.font_indicators, width=12)
+        self.label_g.place(x=745, y=120)
+        # Vo
+        self.label_Vo= tkinter.Label(master=self.tk, text="Vo = 0.0 м/с", fg=self.fg_indicators, bg=self.bg_indicators, font="Arial 20", width=11, height=2)
+        self.label_Vo.place(x=150, y=20)
+        # Angle
+        self.label_angle = tkinter.Label(master=self.tk, text="Angle = 0 degrees", fg=self.fg_indicators, bg=self.bg_indicators, font=self.font_indicators)
+        self.label_angle.place(x=10, y=100)
+
+    def create_btns(self):
+        a = 370
+        b = 700
+        self.button_st = tkinter.Button(text="Start", bg=self.bg_indicators, font="Arial 15",
+            fg=self.fg_indicators, activebackground="#222", width=13)
+        self.button_st.place(x=b, y=a)
+        self.button_rest = tkinter.Button(text="Restart", bg=self.bg_indicators, font="Arial 15",
+            fg=self.fg_indicators, activebackground="#222", width=13)
+        self.button_rest.place(x=b, y=a+50)
+        self.button_rest = tkinter.Button(text="Pause", bg=self.bg_indicators, font="Arial 15",
+            fg=self.fg_indicators, activebackground="#222", width=13)
+        self.button_rest.place(x=b, y=a+100)
+        self.button_set = tkinter.Button(text="Setup", bg=self.bg_indicators, font="Arial 15",
+            fg=self.fg_indicators, activebackground="#222", width=13)
+        self.button_set.place(x=b, y=a+150)
 
     def create_scale(self):
-        self.scale_w = tkinter.Scale(
+        self.scale_st = tkinter.Scale(
             master=self.tk, orient="vertical", resolution=2, from_=150, to=0,
-            highlightbackground="#fb0", length=150
-            )
-        self.label_scale = tkinter.Label(master=self.tk, text="Height", bg="#fb0")
-        self.label_scale.place(x=30, y=425)
-        self.scale_w.place(x=30, y=450)
+            highlightbackground="#fb0", length=150, width=33,
+            font="Arial 10"
+        )
+        self.label_scale = tkinter.Label(master=self.tk, text="Height, cm", bg="#fb0", font="Arial 10")
+        self.label_scale.place(x=23, y=425)
+        self.scale_st.place(x=23, y=450)
+        self.scale_g = tkinter.Scale(
+            master=self.tk, orient="horizontal", resolution=0.1, from_=0, to=20,
+            highlightbackground=self.fg_indicators, sliderlength=40,
+            troughcolor=self.bg_indicators, bd=0, font=self.font_indicators,
+            length=140, width=10
+        )
+        self.scale_g.place(x=744, y=160)
 
 
-
+#969EBD
 app = HELP()
