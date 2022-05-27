@@ -1,5 +1,6 @@
 import tkinter as tkinter
 import math as math
+import time as time
 
 class HELP():
     def __init__(self):
@@ -10,9 +11,12 @@ class HELP():
         self.create_items()
         self.create_btns()
         self.act = True
-        self.tk.bind_all("<Motion>",lambda x:self.arr_moving(x,'motion'))
-        self.tk.bind_all("<Button-1>",lambda x:self.arr_moving(x,'pressed'))
-        self.tk.bind_all("<ButtonRelease-1>", lambda x: self.arr_moving(x, 'released'))
+        self.btn_action = "none"
+        print(self.btn_action)
+        if self.btn_action == "none":
+            self.tk.bind_all("<Motion>",lambda x:self.arr_moving(x,'motion'))
+            self.tk.bind_all("<Button-1>",lambda x:self.arr_moving(x,'pressed'))
+            self.tk.bind_all("<ButtonRelease-1>", lambda x: self.arr_moving(x, 'released'))
         self.tk.mainloop()
 
     def create_field(self):
@@ -66,34 +70,37 @@ class HELP():
 
     def arr_moving(self, event, action=None):
         '''Движение стрелки и предметов'''
-        print("Hey", event.widget)
-        self.change_items()
-        if action == "pressed":
-            self.act = True
-        elif action == "released":
-            self.act = False
+        #print("Hey", event.widget)
+        print(self.btn_action)
+        if self.btn_action != "start":
 
-        if self.act and event.widget == self.canv:
-            self.canv.coords(self.arrow, self.body_center_hori, self.body_center_vert, event.x, event.y)
-            self.a = event.x
-            self.b = event.y
-        elif self.act:
-            self.canv.coords(self.arrow, self.body_center_hori, self.body_center_vert,
-                self.a, self.b)
-        self.arr_crd = self.canv.coords(self.arrow)
-        self.Vx = (self.arr_crd[2] - self.arr_crd[0]) / 100
-        self.Vy = (self.arr_crd[1] - self.arr_crd[3]) / 100
-        print(self.Vx, self.Vy)
-        self.Vo = round((self.Vx**2 + self.Vy**2)**0.5, 2)
-        self.label_Vx.config(text="Vx = " + str(self.Vx) + " м/с")
-        self.label_Vy.config(text="Vy = " + str(self.Vy) + " м/с")
-        self.label_g.config(text="g = " + str(self.scale_g.get()) + " м/с")
-        self.label_Vo.config(text="Vo = " + str(self.Vo) + " м/с")
-        self.angle = math.atan2(self.Vy/self.Vo, self.Vx/self.Vo) * 180.0/math.pi
-        if str(round(self.angle)) != "1":
-            self.label_angle.config(text="Angle = " + str(round(self.angle)) + " degrees")
-        else:
-            self.label_angle.config(text="Angle = 1 degree")
+            self.change_items()
+            if action == "pressed":
+                self.act = True
+            elif action == "released":
+                self.act = False
+
+            if self.act and event.widget == self.canv:
+                self.canv.coords(self.arrow, self.body_center_hori, self.body_center_vert, event.x, event.y)
+                self.a = event.x
+                self.b = event.y
+            elif self.act:
+                self.canv.coords(self.arrow, self.body_center_hori, self.body_center_vert,
+                    self.a, self.b)
+            self.arr_crd = self.canv.coords(self.arrow)
+            self.Vx = (self.arr_crd[2] - self.arr_crd[0]) / 100
+            self.Vy = (self.arr_crd[1] - self.arr_crd[3]) / 100
+            #print(self.Vx, self.Vy)
+            self.Vo = round((self.Vx**2 + self.Vy**2)**0.5, 2)
+            self.label_Vx.config(text="Vx = " + str(self.Vx) + " м/с")
+            self.label_Vy.config(text="Vy = " + str(self.Vy) + " м/с")
+            self.label_g.config(text="g = " + str(self.scale_g.get()) + " м/с")
+            self.label_Vo.config(text="Vo = " + str(self.Vo) + " м/с")
+            self.angle = math.atan2(self.Vy/self.Vo, self.Vx/self.Vo) * 180.0/math.pi
+            if str(round(self.angle)) != "1":
+                self.label_angle.config(text="Angle = " + str(round(self.angle)) + " degrees")
+            else:
+                self.label_angle.config(text="Angle = 1 degree")
 
     def change_items(self):
         self.canv.coords(self.stand, 100, 600 - self.scale_st.get(), 150, 600)
@@ -115,23 +122,49 @@ class HELP():
         self.label_Vo= tkinter.Label(master=self.tk, text="Vo = 0.0 м/с", fg=self.fg_indicators, bg=self.bg_indicators, font="Arial 20", width=11, height=2)
         self.label_Vo.place(x=150, y=20)
         # Angle
-        self.label_angle = tkinter.Label(master=self.tk, text="Angle = 0 degrees", fg=self.fg_indicators, bg=self.bg_indicators, font=self.font_indicators)
+        self.label_angle = tkinter.Label(master=self.tk, text="Angle = 0 degrees", fg=self.fg_indicators,
+            bg=self.bg_indicators, font=self.font_indicators)
         self.label_angle.place(x=10, y=100)
+
+    def btn_start(self):
+        self.btn_action = "start"
+        #print(self.Vo, self.scale_g.get(), self.scale_st.get())
+        self.check_body()
+        print(self.body_center_hori, self.body_center_vert)
+        self.body_center_hori += (self.Vx)*100
+        Sy = (self.Vy- (self.scale_g.get()/2))*100
+        self.body_center_vert -= Sy
+        self.Vy -= self.scale_g.get()
+
+        self.canv.coords(self.body, self.body_center_hori, self.body_center_vert,self.body_center_hori + 10, self.body_center_vert + 10)
+        print("did")
+        print(self.btn_action)
+        time.sleep(0.1)
+
+
+    def btn_restart(self):
+        self.btn_action = "restart"
+
+    def btn_pause(self):
+        self.btn_action = "pause"
+
+    def btn_setup(self):
+        self.btn_action = "setup"
 
     def create_btns(self):
         a = 370
         b = 700
         self.button_st = tkinter.Button(text="Start", bg=self.bg_indicators, font="Arial 15",
-            fg=self.fg_indicators, activebackground="#222", width=13)
+            fg=self.fg_indicators, activebackground="#222", width=13, command=self.btn_start)
         self.button_st.place(x=b, y=a)
         self.button_rest = tkinter.Button(text="Restart", bg=self.bg_indicators, font="Arial 15",
-            fg=self.fg_indicators, activebackground="#222", width=13)
+            fg=self.fg_indicators, activebackground="#222", width=13, command=self.btn_restart)
         self.button_rest.place(x=b, y=a+50)
-        self.button_rest = tkinter.Button(text="Pause", bg=self.bg_indicators, font="Arial 15",
-            fg=self.fg_indicators, activebackground="#222", width=13)
-        self.button_rest.place(x=b, y=a+100)
+        self.button_pause = tkinter.Button(text="Pause", bg=self.bg_indicators, font="Arial 15",
+            fg=self.fg_indicators, activebackground="#222", width=13, command=self.btn_pause)
+        self.button_pause.place(x=b, y=a+100)
         self.button_set = tkinter.Button(text="Setup", bg=self.bg_indicators, font="Arial 15",
-            fg=self.fg_indicators, activebackground="#222", width=13)
+            fg=self.fg_indicators, activebackground="#222", width=13, command=self.btn_setup)
         self.button_set.place(x=b, y=a+150)
 
     def create_scale(self):
